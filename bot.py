@@ -1,19 +1,34 @@
-import telebot
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
-# Ваш токен бота
-TOKEN = '7493472977:AAGeK-hlJUPhUBpFlSFdO0e0FI1uu-rL5x8'
+# Определите обработчик команды /start
+def start(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text('Привет! Я ваш бот. Как я могу помочь вам сегодня?')
 
-bot = telebot.TeleBot(TOKEN)
+# Определите обработчик сообщений
+def echo(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(update.message.text)
 
-# Обработчик команды /start
-@bot.message_handler(commands=['start'])
-def send_welcome(message):
-    bot.reply_to(message, "Привет! Я готов к работе. Попробуйте отправить мне сообщение.")
+# Определите функцию main
+def main() -> None:
+    # Вставьте сюда ваш токен
+    token = '7493472977:AAGeK-hlJUPhUBpFlSFdO0e0FI1uu-rL5x8'
 
-# Обработчик всех текстовых сообщений
-@bot.message_handler(func=lambda message: True)
-def echo_message(message):
-    bot.reply_to(message, message.text)  # Простое эхо
+    # Создайте Updater и передайте ему токен вашего бота
+    updater = Updater(token, use_context=True)
 
-# Запуск бота
-bot.polling()
+    # Получите диспетчера для регистрации обработчиков
+    dp = updater.dispatcher
+
+    # Зарегистрируйте обработчики
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+
+    # Запустите бота
+    updater.start_polling()
+
+    # Запускайте бота до тех пор, пока вы не нажмете Ctrl-C или процесс не будет завершен
+    updater.idle()
+
+if name == 'main':
+    main()
